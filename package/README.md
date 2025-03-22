@@ -1,15 +1,16 @@
 ## What does it do
 You press a button (F by default), nearby valuable items are discovered (and shown on screen). Already discovered items are shown a second time.
 
-Items discovered initially will appear on your minimap as usual. Even for your friends, should you be playing multiplayer.
+If Multiplayer RPC is enabled, items discovered for the first time with the scanner will appear on both your minimap and your friends', should you be playing multiplayer.
 
 Has a cooldown of 10 seconds, tracked on the top of the screen. Said bar shouldn't appear by itself unless scanner is used.
 
 ## Configuring
-Use your modinstaller (or BepInEx's config).
-- Keybind for scanning can be changed (f by default)
+Use your modinstaller, BepInEx's config, or [REPOConfig](https://thunderstore.io/c/repo/p/nickklmao/REPOConfig/)
+- Keybind for scanning can be changed (f by default, doesn't show up in REPOConfig)
 - Scan radius can be changed (10 by default)
 - Cooldown can be changed (10 by default)
+- Multiplayer RPC discovery can be changed (true by default)
 
 ## Installation
 1. Download the REPO Scanner Mod package.

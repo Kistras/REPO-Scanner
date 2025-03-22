@@ -104,6 +104,8 @@ public class ScannerGUI : MonoBehaviour {
         
         // Caption
         GUIStyle textStyle = new GUIStyle(GUI.skin.label);
+        textStyle.font = GUI.skin.font;
+        textStyle.fontSize = 14;
         textStyle.alignment = TextAnchor.MiddleCenter;
         textStyle.fontStyle = FontStyle.Bold;
         textStyle.normal.textColor = new Color(1f, 1f, 1f, displayAlpha);
