@@ -1,0 +1,35 @@
+# Build
+bin/
+obj/
+
+# Rider
+.idea/
+.idea_modules/
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/dictionaries
+.idea/libraries
+.idea/.rider/
+
+*.sln.iml
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.csproj.user
+
+.vscode/
+*.log
+*.DS_Store
+*.swp
+*.swo
+*.bak
+*.tmp
+*.temp
+*.pid
+*.seed
+*.pid.lock
+
+# Package
+Kistras-Scanner.dll
+package.zip

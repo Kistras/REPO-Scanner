@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "REPO-Scanner", "REPO-Scanner.csproj", "{C052ED98-CCE5-34AA-D405-F3A473F165DF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C052ED98-CCE5-34AA-D405-F3A473F165DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C052ED98-CCE5-34AA-D405-F3A473F165DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C052ED98-CCE5-34AA-D405-F3A473F165DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C052ED98-CCE5-34AA-D405-F3A473F165DF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {48697D7B-54B7-4560-B71E-88A06586055F}
+	EndGlobalSection
+EndGlobal
