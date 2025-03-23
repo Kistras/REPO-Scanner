@@ -6,8 +6,8 @@ If Multiplayer RPC is enabled, items discovered for the first time with the scan
 Has a cooldown of 10 seconds, tracked on the top of the screen. Said bar shouldn't appear by itself unless scanner is used.
 
 ## Configuring
-Use your modinstaller, BepInEx's config, or [REPOConfig](https://thunderstore.io/c/repo/p/nickklmao/REPOConfig/)
-- Keybind for scanning can be changed (f by default, doesn't show up in REPOConfig)
+Use your modinstaller, BepInEx's config or [REPOConfig](https://thunderstore.io/c/repo/p/nickklmao/REPOConfig/)
+- Keybind for scanning can be changed (f by default)
 - Scan radius can be changed (10 by default)
 - Cooldown can be changed (10 by default)
 - Multiplayer RPC discovery can be changed (true by default)
@@ -15,6 +15,7 @@ Use your modinstaller, BepInEx's config, or [REPOConfig](https://thunderstore.io
 ## Installation
 1. Download the REPO Scanner Mod package.
 2. Extract the contents to the game's `BepInEx/plugins` directory.
+
 Or use [Gale](https://thunderstore.io/c/repo/p/Kesomannen/GaleModManager/)/[r2modman](https://thunderstore.io/c/repo/p/ebkr/r2modman/).
 
 ## Why scan GUI ugly and not in the style of the game

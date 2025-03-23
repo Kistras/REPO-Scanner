@@ -1,6 +1,6 @@
 {
     "name": "Valuables_Scanner",
-    "version_number": "1.0.4",
+    "version_number": "1.0.5",
     "website_url": "https://github.com/Kistras/REPO-Scanner",
     "description": "Discovers (for your teammates too!) nearby valuables when a key is pressed (F by default). Multiplayer friendly.",
     "dependencies": ["BepInEx-BepInExPack-5.4.2100"]
