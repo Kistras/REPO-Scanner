@@ -34,7 +34,7 @@ public class ScannerGUI : MonoBehaviour {
     }
 
     void Initialize() {
-        lastDisplayTime = Plugin.cooldown.Value;
+        lastDisplayTime = ConfigManager.cooldown.Value;
         
         // Create textures for UI elements
         barTexture = new Texture2D(1, 1);
@@ -66,7 +66,7 @@ public class ScannerGUI : MonoBehaviour {
             return;
             
         float remainingCooldown = Scanner.GetRemainingCooldown();
-        float cooldownRatio = remainingCooldown / Plugin.cooldown.Value;
+        float cooldownRatio = remainingCooldown / ConfigManager.cooldown.Value;
         bool isOnCooldown = Scanner.IsOnCooldown();
         
         // Calculate fade based on cooldown state
@@ -118,7 +118,8 @@ public class ScannerGUI : MonoBehaviour {
     }
     
     private bool ShouldShowGUI() {
-        return PlayerController.instance != null && 
+        return ConfigManager.toCreateGUI.Value &&
+               PlayerController.instance != null && 
                LevelGenerator.Instance != null && 
                LevelGenerator.Instance.Generated && 
                !SemiFunc.MenuLevel();

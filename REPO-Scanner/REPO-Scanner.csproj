@@ -4,7 +4,7 @@
         <TargetFramework>netstandard2.1</TargetFramework>
         <AssemblyName>Kistras-Scanner</AssemblyName>
         <Product>REPO Scanner</Product>
-        <Version>1.0.5</Version>
+        <Version>1.1.0</Version>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <LangVersion>latest</LangVersion>
         <RestoreAdditionalProjectSources>
@@ -28,6 +28,9 @@
     <ItemGroup>
       <Reference Include="Assembly-CSharp">
         <HintPath>D:\Program Files\Steam\steamapps\common\REPO\ref\Assembly-CSharp-publicized.dll</HintPath>
+      </Reference>
+      <Reference Include="Kistras-CustomDiscoverStateLib">
+        <HintPath>..\..\CustomDiscoverStateLib\bin\Debug\netstandard2.1\Kistras-CustomDiscoverStateLib.dll</HintPath>
       </Reference>
       <Reference Include="MenuLib">
         <HintPath>D:\Program Files\Gale\MODFOLD\repo\profiles\Default\BepInEx\plugins\nickklmao-MenuLib\MenuLib.dll</HintPath>
