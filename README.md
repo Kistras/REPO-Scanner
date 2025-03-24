@@ -35,6 +35,9 @@ Because I can't figure out how to make it render properly.
 <details>
   <summary>Click to expand</summary>
   <img src="https://i.imgur.com/5St7tSd.png" alt="GUI"/>
+  <img src="https://i.imgur.com/f27bBng.png" alt="Overview"/>
+  <img src="https://i.imgur.com/zSZ1kwP.png" alt="Enemies"/>
+  <img src="https://i.imgur.com/Od92yHa.png" alt="Items"/>
 </details>
 
 ## Known issues
