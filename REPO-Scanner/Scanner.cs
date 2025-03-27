@@ -68,6 +68,7 @@ public class Scanner {
         Vector3 scanPosition = Camera.main.transform.position;
         Collider[] colliders = Physics.OverlapSphere(scanPosition, ConfigManager.scanRadius.Value);
 
+        var scannedPositions = new System.Collections.Generic.List<Vector3>();
         foreach (Collider collider in colliders) {
             if (collider == null || collider.transform == null) continue;
 
@@ -75,7 +76,7 @@ public class Scanner {
             if (ConfigManager.shouldScanValuables.Value) {
                 ValuableObject valuable = collider.GetComponentInParent<ValuableObject>() ??
                                           collider.GetComponentInChildren<ValuableObject>();
-                if (valuable != null) {
+                if (valuable != null && !HasScannedItemsNearby(valuable.transform.position, scannedPositions)) {
                     if (ConfigManager.multiplayerReveal.Value) {
                         valuable.Discover(DiscoverValuableState);
                     } else {
@@ -89,7 +90,7 @@ public class Scanner {
             if (ConfigManager.shouldScanEnemies.Value) {
                 EnemyRigidbody enemy = collider.GetComponentInParent<EnemyRigidbody>() ??
                                        collider.GetComponentInChildren<EnemyRigidbody>();
-                if (enemy != null) {
+                if (enemy != null && !HasScannedItemsNearby(enemy.transform.position, scannedPositions)) {
                     ValuableDiscover.instance.New(enemy.physGrabObject, DiscoverEnemyState);
                     continue;
                 }
@@ -99,7 +100,7 @@ public class Scanner {
             if (ConfigManager.shouldScanHeads.Value) {
                 PlayerDeathHead head = collider.GetComponentInParent<PlayerDeathHead>() ??
                                        collider.GetComponentInChildren<PlayerDeathHead>();
-                if (head != null) {
+                if (head != null && !HasScannedItemsNearby(head.transform.position, scannedPositions)) {
                     ValuableDiscover.instance.New(head.physGrabObject, DiscoverHeadState);
                     continue;
                 }
@@ -109,9 +110,8 @@ public class Scanner {
             if (ConfigManager.shouldScanItems.Value) {
                 ItemAttributes item = collider.GetComponentInParent<ItemAttributes>() ??
                                       collider.GetComponentInChildren<ItemAttributes>();
-                if (item != null) {
+                if (item != null && !HasScannedItemsNearby(item.transform.position, scannedPositions)) {
                     ValuableDiscover.instance.New(item.physGrabObject, DiscoverItemState);
-                    continue;
                 }
             }
         }
@@ -122,25 +122,15 @@ public class Scanner {
         }
     }
 
-    /*private static void CheckForItems(Collider collider) {
-        Component[] components = collider.gameObject.GetComponents<Component>();
-        
-        foreach (Component component in components) {
-            if (component == null) continue;
-            
-            Type componentType = component.GetType();
-            if (!componentType.Name.StartsWith("Item")) continue;
-            
-            FieldInfo fieldInfo = AccessTools.Field(componentType, "PhysGrabObject");
-            if (fieldInfo == null) continue;
-            
-            PhysGrabObject physGrabObject = fieldInfo.GetValue(component) as PhysGrabObject;
-            if (physGrabObject != null) {
-                ValuableDiscover.instance.New(physGrabObject, DiscoverItemState);
-                return;
+    private static bool HasScannedItemsNearby(Vector3 itemPos, System.Collections.Generic.List<Vector3> scannedPositions) {
+        foreach (Vector3 pos in scannedPositions) {
+            if (Vector3.Distance(pos, itemPos) < 0.1f) {
+                scannedPositions.Add(itemPos);
+                return true;
             }
         }
-    }*/
+        return false;
+    }
 
     public static void Update() {}
 
