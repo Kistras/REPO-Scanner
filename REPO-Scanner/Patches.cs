@@ -61,10 +61,10 @@ public class Patches {
         // Only try to create when player exists
         if (PlayerController.instance == null)
             return;
-            
-        // Avoid multiple attempts too fast    
+        
         GameObject guiObject = new GameObject("ScannerGUI");
         guiObject.AddComponent<ScannerGUI>();
-        GameObject.DontDestroyOnLoad(guiObject);
+        guiObject.transform.SetParent(HUDCanvas.instance.transform, false);
+        //GameObject.DontDestroyOnLoad(guiObject);
     }
 }
