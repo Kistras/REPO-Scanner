@@ -1,3 +1,7 @@
+1.1.2 - Now GUI is rendered in the style of the game, optional (with config). Adjusted colors. Fixes some objects being registered twice (or more)
+
+1.1.1 - Updated images for Thunderstore page
+
 1.1.0 - Now can scan for enemies, weapons and dead heads. Config ability to disable scanning of each thing. GUI now can be disabled at all. Added new dependency (optional, but it's better to be installed)
 
 1.0.5 - Keybind is now shown in REPOConfig. Cuz of the new format it had been reset to default. Loosened cooldown constraints.

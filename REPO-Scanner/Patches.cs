@@ -7,7 +7,7 @@ namespace REPO_Scanner;
 
 [HarmonyPatch]
 public class Patches {
-    private static float lastGuiCheckTime = 0f;
+    internal static float lastGuiCheckTime = 0f;
 
     [HarmonyPatch(typeof(InputManager), "InitializeInputs")]
     [HarmonyPostfix]
@@ -61,10 +61,11 @@ public class Patches {
         // Only try to create when player exists
         if (PlayerController.instance == null)
             return;
-            
-        // Avoid multiple attempts too fast    
+        
         GameObject guiObject = new GameObject("ScannerGUI");
         guiObject.AddComponent<ScannerGUI>();
-        GameObject.DontDestroyOnLoad(guiObject);
+
+        guiObject.transform.SetParent(HUDCanvas.instance.transform, false);
+        //GameObject.DontDestroyOnLoad(guiObject);
     }
 }

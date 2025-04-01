@@ -11,10 +11,10 @@ public class Scanner {
     private const ValuableDiscoverGraphic.State DiscoverEnemyState = ValuableDiscoverGraphic.State.Bad;
     // While identical to the Bad state, this allows you not to get stuck in the Bad state for like 4 seconds
     private static ValuableDiscoverGraphic.State DiscoverHeadState = NewCustomState(
-        new Color(1f, 0.0f, 0.067f, 0.059f), 
-        new Color(1f, 0.1f, 0.067f, 0.59f));
+        new Color(1f, 0.0f, 0.067f, 0.17f), 
+        new Color(1f, 0.1f, 0.067f, 0.75f));
     private static ValuableDiscoverGraphic.State DiscoverItemState = NewCustomState(
-        new Color(0.0f, 0.5f, 0.8f, 0.075f), 
+        new Color(0.0f, 0.5f, 0.8f, 0.17f), 
         new Color(0.1f, 0.6f, 0.9f, 0.75f));
     private static float lastScanTime;
     private static bool isInitialized = false;
@@ -76,7 +76,7 @@ public class Scanner {
             if (ConfigManager.shouldScanValuables.Value) {
                 ValuableObject valuable = collider.GetComponentInParent<ValuableObject>() ??
                                           collider.GetComponentInChildren<ValuableObject>();
-                if (valuable != null && !HasScannedItemsNearby(valuable.transform.position, scannedPositions)) {
+                if (valuable != null && !LacksScannedItemsNearby(valuable.transform.position, scannedPositions)) {
                     if (ConfigManager.multiplayerReveal.Value) {
                         valuable.Discover(DiscoverValuableState);
                     } else {
@@ -90,7 +90,7 @@ public class Scanner {
             if (ConfigManager.shouldScanEnemies.Value) {
                 EnemyRigidbody enemy = collider.GetComponentInParent<EnemyRigidbody>() ??
                                        collider.GetComponentInChildren<EnemyRigidbody>();
-                if (enemy != null && !HasScannedItemsNearby(enemy.transform.position, scannedPositions)) {
+                if (enemy != null && LacksScannedItemsNearby(enemy.transform.position, scannedPositions)) {
                     ValuableDiscover.instance.New(enemy.physGrabObject, DiscoverEnemyState);
                     continue;
                 }
@@ -100,7 +100,7 @@ public class Scanner {
             if (ConfigManager.shouldScanHeads.Value) {
                 PlayerDeathHead head = collider.GetComponentInParent<PlayerDeathHead>() ??
                                        collider.GetComponentInChildren<PlayerDeathHead>();
-                if (head != null && !HasScannedItemsNearby(head.transform.position, scannedPositions)) {
+                if (head != null && LacksScannedItemsNearby(head.transform.position, scannedPositions)) {
                     ValuableDiscover.instance.New(head.physGrabObject, DiscoverHeadState);
                     continue;
                 }
@@ -110,7 +110,7 @@ public class Scanner {
             if (ConfigManager.shouldScanItems.Value) {
                 ItemAttributes item = collider.GetComponentInParent<ItemAttributes>() ??
                                       collider.GetComponentInChildren<ItemAttributes>();
-                if (item != null && !HasScannedItemsNearby(item.transform.position, scannedPositions)) {
+                if (item != null && LacksScannedItemsNearby(item.transform.position, scannedPositions)) {
                     ValuableDiscover.instance.New(item.physGrabObject, DiscoverItemState);
                 }
             }
@@ -122,14 +122,14 @@ public class Scanner {
         }
     }
 
-    private static bool HasScannedItemsNearby(Vector3 itemPos, System.Collections.Generic.List<Vector3> scannedPositions) {
+    private static bool LacksScannedItemsNearby(Vector3 itemPos, System.Collections.Generic.List<Vector3> scannedPositions) {
         foreach (Vector3 pos in scannedPositions) {
             if (Vector3.Distance(pos, itemPos) < 0.1f) {
-                scannedPositions.Add(itemPos);
-                return true;
+                return false;
             }
         }
-        return false;
+        scannedPositions.Add(itemPos);
+        return true;
     }
 
     public static void Update() {}

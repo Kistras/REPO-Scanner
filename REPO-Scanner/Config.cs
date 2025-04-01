@@ -13,6 +13,8 @@ public static class ConfigManager {
     public static ConfigEntry<float> cooldown;
     public static ConfigEntry<bool> multiplayerReveal;
     public static ConfigEntry<bool> toCreateGUI;
+    public static ConfigEntry<string> versionGUI; // String to support REPOConfig
+    public static bool IsLegacyVersionGUI { get; private set; }
     
     public static ConfigEntry<bool> shouldScanValuables;
     public static ConfigEntry<bool> shouldScanEnemies;
@@ -37,6 +39,8 @@ public static class ConfigManager {
             new ConfigDescription("Whether to reveal scan results on other players' minimaps in multiplayer"));
         toCreateGUI = plugin.Config.Bind("Options", "Create GUI", true,
             new ConfigDescription("Whether to create cooldown GUI"));
+        versionGUI = plugin.Config.Bind("Options", "GUI Version", "New",
+            new ConfigDescription("New version uses REPO's screen effects", new AcceptableValueList<string>("New", "Legacy")));
         
         shouldScanValuables = plugin.Config.Bind("Features", "Valuables", true, 
             new ConfigDescription("Whether to scan valuables"));
@@ -47,8 +51,17 @@ public static class ConfigManager {
         shouldScanItems = plugin.Config.Bind("Features", "Items", true, 
             new ConfigDescription("Whether to scan equippable items"));
         
+        IsLegacyVersionGUI = versionGUI.Value == "Legacy";
+            
         keyBind.SettingChanged += (sender, args) => {
             RebindScan();
+        };
+        versionGUI.SettingChanged += (sender, args) => {
+            IsLegacyVersionGUI = versionGUI.Value == "Legacy";
+            if (ScannerGUI.Instance) {
+                GameObject.Destroy(ScannerGUI.Instance);
+                Patches.lastGuiCheckTime = 0f;
+            }
         };
     }
     
