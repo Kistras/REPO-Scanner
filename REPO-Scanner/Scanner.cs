@@ -76,13 +76,13 @@ public class Scanner {
             if (ConfigManager.shouldScanValuables.Value) {
                 ValuableObject valuable = collider.GetComponentInParent<ValuableObject>() ??
                                           collider.GetComponentInChildren<ValuableObject>();
-                if (valuable != null && !LacksScannedItemsNearby(valuable.transform.position, scannedPositions)) {
+                if (valuable != null && LacksScannedItemsNearby(valuable.transform.position, scannedPositions)) {
                     if (ConfigManager.multiplayerReveal.Value) {
                         valuable.Discover(DiscoverValuableState);
                     } else {
                         ValuableDiscover.instance.New(valuable.physGrabObject, DiscoverValuableState);
                     }
-                    continue; // Skip further checks if we found a valuable
+                    continue;
                 }
             }
 
