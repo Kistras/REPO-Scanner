@@ -9,7 +9,7 @@ Has a cooldown of 10 seconds, tracked on the top of the screen. Said bar shouldn
 
 You can switch between a new GUI version (the one where all screen effects are applied) and a legacy one (where it's as clear as possible). There's two versions because I liked the clear one and my friend liked the immersive one.
 
-I believe that at this point the development of this mod is complete. [Feel free to contribute](https://github.com/Kistras/REPO-Scanner) if you want to.
+I believe that at this point the development of this mod is complete. [Feel free to contribute or report issues](https://github.com/Kistras/REPO-Scanner).
 
 ## Configuring
 Use your modinstaller, BepInEx's config or [REPOConfig](https://thunderstore.io/c/repo/p/nickklmao/REPOConfig/)
