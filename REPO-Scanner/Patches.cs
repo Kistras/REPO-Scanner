@@ -11,16 +11,16 @@ public class Patches {
 
     [HarmonyPatch(typeof(InputManager), "InitializeInputs")]
     [HarmonyPostfix]
+    // ReSharper disable once InconsistentNaming - Harmony-specific postfix method
     private static void InputManagerInitializeInputsPostfix(InputManager __instance) {
         try {
             Plugin.Logger.LogInfo("Setting up scan input action...");
+            if (InputManager.instance.inputActions.ContainsKey(ConfigManager.scanKey)) return;
             
-            if (!InputManager.instance.inputActions.ContainsKey(ConfigManager.scanKey)) {
-                InputAction scanAction = new InputAction("Scan", binding: ConfigManager.KeyCodeToBindingPath(ConfigManager.keyBind.Value));
-                InputManager.instance.inputActions.Add(ConfigManager.scanKey, scanAction);
-                scanAction.Enable();
-                Plugin.Logger.LogInfo("Added scan input action");
-            }
+            InputAction scanAction = new InputAction("Scan", binding: ConfigManager.KeyCodeToBindingPath(ConfigManager.keyBind.Value));
+            InputManager.instance.inputActions.Add(ConfigManager.scanKey, scanAction);
+            scanAction.Enable();
+            Plugin.Logger.LogInfo("Added scan input action");
         } catch (Exception ex) {
             Plugin.Logger.LogError($"Error in InputManagerInitializeInputsPostfix: {ex.Message}");
         }
@@ -54,11 +54,8 @@ public class Patches {
             
         lastGuiCheckTime = Time.time;
         
-        // If GUI already exists, nothing to do
         if (ScannerGUI.Instance != null)
             return;
-            
-        // Only try to create when player exists
         if (PlayerController.instance == null)
             return;
         

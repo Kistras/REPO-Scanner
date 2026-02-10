@@ -6,6 +6,8 @@ using UnityEngine;
 namespace REPO_Scanner;
 
 public static class ConfigManager {
+    const float MaxRadius = 100f;
+        
     public static InputKey scanKey = (InputKey)327;
     
     public static ConfigEntry<KeyCode> keyBind;
@@ -13,26 +15,44 @@ public static class ConfigManager {
     public static ConfigEntry<float> cooldown;
     public static ConfigEntry<bool> multiplayerReveal;
     public static ConfigEntry<bool> toCreateGUI;
-    public static ConfigEntry<string> versionGUI; // String to support REPOConfig
+    public static ConfigEntry<string> versionGUI; // <string> so it could be changed through REPOConfig
     public static bool IsLegacyVersionGUI { get; private set; }
     
     public static ConfigEntry<bool> shouldScanValuables;
+    public static ConfigEntry<bool> onlyScanDiscoveredValuables;
     public static ConfigEntry<bool> shouldScanEnemies;
     public static ConfigEntry<bool> shouldScanHeads;
     public static ConfigEntry<bool> shouldScanItems;
     
-    private static KeyCode storedKeybind; // Used to check if keybind has changed
-    private static bool initialized = false;
+    public static ConfigEntry<float> scanRadiusValuablesOverride;
+    public static ConfigEntry<float> scanRadiusEnemiesOverride;
+    public static ConfigEntry<float> scanRadiusHeadsOverride;
+    public static ConfigEntry<float> scanRadiusItemsOverride;
+
+    public static float MaxScanRadius
+    {
+        get {
+            float max = 0;  
+            if (shouldScanValuables.Value) max = Mathf.Max(max, scanRadiusValuablesOverride.Value > 0 ? scanRadiusValuablesOverride.Value : scanRadius.Value);
+            if (shouldScanEnemies.Value) max = Mathf.Max(max, scanRadiusEnemiesOverride.Value > 0 ? scanRadiusEnemiesOverride.Value : scanRadius.Value);
+            if (shouldScanHeads.Value) max = Mathf.Max(max, scanRadiusHeadsOverride.Value > 0 ? scanRadiusHeadsOverride.Value : scanRadius.Value);
+            if (shouldScanItems.Value) max = Mathf.Max(max, scanRadiusItemsOverride.Value > 0 ? scanRadiusItemsOverride.Value : scanRadius.Value);
+            return Mathf.Min(max, MaxRadius);
+        }
+    }
+    
+    private static KeyCode _storedKeybind; // Used to check if keybind has changed
+    private static bool _initialized = false;
     
     internal static void Initialize(Plugin plugin) {
-        if (initialized) return;
-        initialized = true;
+        if (_initialized) return;
+        _initialized = true;
         
         keyBind = plugin.Config.Bind("Keybinds", "Scanner Key", KeyCode.F, 
             new ConfigDescription("What you press to scan things"));
         
         scanRadius = plugin.Config.Bind("Options", "Scan Radius", 10f, 
-            new ConfigDescription("Radius of the scanner", new AcceptableValueRange<float>(2f, 100f)));
+            new ConfigDescription("Radius of the scanner", new AcceptableValueRange<float>(2f, MaxRadius)));
         cooldown = plugin.Config.Bind("Options", "Cooldown", 10f, 
             new ConfigDescription("Interval between scans", new AcceptableValueRange<float>(0f, 120f)));
         multiplayerReveal = plugin.Config.Bind("Options", "Multiplayer RPC", true,
@@ -44,12 +64,23 @@ public static class ConfigManager {
         
         shouldScanValuables = plugin.Config.Bind("Features", "Valuables", true, 
             new ConfigDescription("Whether to scan valuables"));
+        onlyScanDiscoveredValuables = plugin.Config.Bind("Features", "Only Scan Discovered", false, 
+            new ConfigDescription("Only scan already discovered valuables (does not reveal new ones)"));
         shouldScanEnemies = plugin.Config.Bind("Features", "Enemies", true, 
             new ConfigDescription("Whether to scan enemies"));
         shouldScanHeads = plugin.Config.Bind("Features", "Heads", true, 
             new ConfigDescription("Whether to scan dead player's heads"));
         shouldScanItems = plugin.Config.Bind("Features", "Items", true, 
             new ConfigDescription("Whether to scan equippable items"));
+        
+        scanRadiusValuablesOverride = plugin.Config.Bind("Radius Overrides", "Valuables", 0f, 
+            new ConfigDescription("Override scan radius for valuables (0 to use main radius)", new AcceptableValueRange<float>(0f, MaxRadius)));
+        scanRadiusEnemiesOverride = plugin.Config.Bind("Radius Overrides", "Enemies", 0f, 
+            new ConfigDescription("Override scan radius for enemies (0 to use main radius)", new AcceptableValueRange<float>(0f, MaxRadius)));
+        scanRadiusHeadsOverride = plugin.Config.Bind("Radius Overrides", "Heads", 0f, 
+            new ConfigDescription("Override scan radius for heads (0 to use main radius)", new AcceptableValueRange<float>(0f, MaxRadius)));
+        scanRadiusItemsOverride = plugin.Config.Bind("Radius Overrides", "Items", 0f, 
+            new ConfigDescription("Override scan radius for items (0 to use main radius)", new AcceptableValueRange<float>(0f, MaxRadius)));
         
         IsLegacyVersionGUI = versionGUI.Value == "Legacy";
             
@@ -58,18 +89,18 @@ public static class ConfigManager {
         };
         versionGUI.SettingChanged += (sender, args) => {
             IsLegacyVersionGUI = versionGUI.Value == "Legacy";
-            if (ScannerGUI.Instance) {
-                GameObject.Destroy(ScannerGUI.Instance);
-                Patches.lastGuiCheckTime = 0f;
-            }
+            if (!ScannerGUI.Instance) return;
+            
+            GameObject.Destroy(ScannerGUI.Instance);
+            Patches.lastGuiCheckTime = 0f;
         };
     }
     
     internal static void RebindScan() {
         if (keyBind?.Value == null || InputManager.instance == null) return;
         
-        if (storedKeybind == keyBind.Value) return;
-        storedKeybind = keyBind.Value;
+        if (_storedKeybind == keyBind.Value) return;
+        _storedKeybind = keyBind.Value;
         string keybind = KeyCodeToBindingPath(keyBind.Value);
         
         Plugin.Logger.LogInfo($"Keybind changed to: {keybind}");

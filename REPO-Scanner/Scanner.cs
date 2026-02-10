@@ -10,10 +10,10 @@ public class Scanner {
     private const ValuableDiscoverGraphic.State DiscoverValuableState = ValuableDiscoverGraphic.State.Discover;
     private const ValuableDiscoverGraphic.State DiscoverEnemyState = ValuableDiscoverGraphic.State.Bad;
     // While identical to the Bad state, this allows you not to get stuck in the Bad state for like 4 seconds
-    private static ValuableDiscoverGraphic.State DiscoverHeadState = NewCustomState(
+    private static ValuableDiscoverGraphic.State discoverHeadState = NewCustomState(
         new Color(1f, 0.0f, 0.067f, 0.17f), 
         new Color(1f, 0.1f, 0.067f, 0.75f));
-    private static ValuableDiscoverGraphic.State DiscoverItemState = NewCustomState(
+    private static ValuableDiscoverGraphic.State discoverItemState = NewCustomState(
         new Color(0.0f, 0.5f, 0.8f, 0.17f), 
         new Color(0.1f, 0.6f, 0.9f, 0.75f));
     private static float lastScanTime;
@@ -66,7 +66,7 @@ public class Scanner {
         }
 
         Vector3 scanPosition = Camera.main.transform.position;
-        Collider[] colliders = Physics.OverlapSphere(scanPosition, ConfigManager.scanRadius.Value);
+        Collider[] colliders = Physics.OverlapSphere(scanPosition, ConfigManager.MaxScanRadius);
 
         var scannedPositions = new System.Collections.Generic.List<Vector3>();
         foreach (Collider collider in colliders) {
@@ -76,7 +76,15 @@ public class Scanner {
             if (ConfigManager.shouldScanValuables.Value) {
                 ValuableObject valuable = collider.GetComponentInParent<ValuableObject>() ??
                                           collider.GetComponentInChildren<ValuableObject>();
-                if (valuable != null && LacksScannedItemsNearby(valuable.transform.position, scannedPositions)) {
+                if (valuable != null) {
+                    float scanRadius = ConfigManager.scanRadiusValuablesOverride.Value > 0f 
+                        ? ConfigManager.scanRadiusValuablesOverride.Value 
+                        : ConfigManager.scanRadius.Value;
+                    if (Vector3.Distance(valuable.transform.position, scanPosition) > scanRadius) continue;
+                    
+                    if (ConfigManager.onlyScanDiscoveredValuables.Value && !valuable.discovered) continue;
+                    if (HasScannedItemsNearby(valuable.transform.position, scannedPositions)) continue;
+                    
                     if (ConfigManager.multiplayerReveal.Value) {
                         valuable.Discover(DiscoverValuableState);
                     } else {
@@ -90,7 +98,13 @@ public class Scanner {
             if (ConfigManager.shouldScanEnemies.Value) {
                 EnemyRigidbody enemy = collider.GetComponentInParent<EnemyRigidbody>() ??
                                        collider.GetComponentInChildren<EnemyRigidbody>();
-                if (enemy != null && LacksScannedItemsNearby(enemy.transform.position, scannedPositions)) {
+                if (enemy != null) {
+                        float scanRadius = ConfigManager.scanRadiusEnemiesOverride.Value > 0f 
+                            ? ConfigManager.scanRadiusEnemiesOverride.Value 
+                            : ConfigManager.scanRadius.Value;
+                        if (Vector3.Distance(enemy.transform.position, scanPosition) > scanRadius) continue;
+                        
+                    if (HasScannedItemsNearby(enemy.transform.position, scannedPositions)) continue;
                     ValuableDiscover.instance.New(enemy.physGrabObject, DiscoverEnemyState);
                     continue;
                 }
@@ -100,8 +114,14 @@ public class Scanner {
             if (ConfigManager.shouldScanHeads.Value) {
                 PlayerDeathHead head = collider.GetComponentInParent<PlayerDeathHead>() ??
                                        collider.GetComponentInChildren<PlayerDeathHead>();
-                if (head != null && LacksScannedItemsNearby(head.transform.position, scannedPositions)) {
-                    ValuableDiscover.instance.New(head.physGrabObject, DiscoverHeadState);
+                if (head != null) {
+                    float scanRadius = ConfigManager.scanRadiusHeadsOverride.Value > 0f 
+                        ? ConfigManager.scanRadiusHeadsOverride.Value 
+                        : ConfigManager.scanRadius.Value;
+                    if (Vector3.Distance(head.transform.position, scanPosition) > scanRadius) continue;
+                    
+                    if (HasScannedItemsNearby(head.transform.position, scannedPositions)) continue;
+                    ValuableDiscover.instance.New(head.physGrabObject, discoverHeadState);
                     continue;
                 }
             }
@@ -110,8 +130,15 @@ public class Scanner {
             if (ConfigManager.shouldScanItems.Value) {
                 ItemAttributes item = collider.GetComponentInParent<ItemAttributes>() ??
                                       collider.GetComponentInChildren<ItemAttributes>();
-                if (item != null && LacksScannedItemsNearby(item.transform.position, scannedPositions)) {
-                    ValuableDiscover.instance.New(item.physGrabObject, DiscoverItemState);
+                if (item != null) {
+                    float scanRadius = ConfigManager.scanRadiusItemsOverride.Value > 0f 
+                        ? ConfigManager.scanRadiusItemsOverride.Value 
+                        : ConfigManager.scanRadius.Value;
+                    if (Vector3.Distance(item.transform.position, scanPosition) > scanRadius) continue;
+                    
+                    if (HasScannedItemsNearby(item.transform.position, scannedPositions)) continue;
+                    ValuableDiscover.instance.New(item.physGrabObject, discoverItemState);
+                    continue;
                 }
             }
         }
@@ -122,14 +149,14 @@ public class Scanner {
         }
     }
 
-    private static bool LacksScannedItemsNearby(Vector3 itemPos, System.Collections.Generic.List<Vector3> scannedPositions) {
+    private static bool HasScannedItemsNearby(Vector3 itemPos, System.Collections.Generic.List<Vector3> scannedPositions) {
         foreach (Vector3 pos in scannedPositions) {
             if (Vector3.Distance(pos, itemPos) < 0.1f) {
-                return false;
+                return true;
             }
         }
         scannedPositions.Add(itemPos);
-        return true;
+        return false;
     }
 
     public static void Update() {}

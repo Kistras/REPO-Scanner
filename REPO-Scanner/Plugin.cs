@@ -15,7 +15,7 @@ namespace REPO_Scanner;
 [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
 [BepInDependency("Kistras-CustomDiscoverStateLib", BepInDependency.DependencyFlags.SoftDependency)]
 public class Plugin : BaseUnityPlugin {
-    internal static new ManualLogSource Logger;
+    internal new static ManualLogSource Logger;
     private readonly Harmony harmony = new Harmony(MyPluginInfo.PLUGIN_GUID);
     internal static bool isCustomDiscoverStateLibLoaded;
     
@@ -33,6 +33,6 @@ public class Plugin : BaseUnityPlugin {
             Logger.LogInfo("CustomDiscoverStateLib is not loaded. Will fallback to \"Reminder\" graphic. Consider installing all dependencies.");
         }
 
-        Logger.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded!");
+        Logger.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} ({MyPluginInfo.PLUGIN_VERSION}) is loaded!");
     }
 }

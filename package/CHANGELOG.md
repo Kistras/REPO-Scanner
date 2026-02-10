@@ -1,3 +1,5 @@
+1.2.0 - Updated dependencies, added separate options to override scan radius for specific categories and an option to only show already discovered valuables
+
 1.1.3 - Fixed a typo that prevented some items from being discovered
 
 1.1.2 - Now GUI is rendered in the style of the game, optional (with config). Adjusted colors. Fixes some objects being registered twice (or more)

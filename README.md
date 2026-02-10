@@ -1,5 +1,5 @@
 ## What does it do
-You press a button (F by default), nearby valuable items are discovered (and shown on screen). Already discovered items are shown a second time.
+You press a button (F by default), nearby valuable items are discovered (and shown on screen). Already discovered items are shown a second time. There is an option to only scan already discovered valuables (disabled by default).
 
 If Multiplayer RPC is enabled, items discovered for the first time with the scanner will appear on both your minimap and your friends', should you be playing multiplayer.
 
@@ -9,7 +9,7 @@ Has a cooldown of 10 seconds, tracked on the top of the screen. Said bar shouldn
 
 You can switch between a new GUI version (the one where all screen effects are applied) and a legacy one (where it's as clear as possible). There's two versions because I liked the clear one and my friend liked the immersive one.
 
-I believe that at this point the development of this mod is complete. [Feel free to contribute or report issues](https://github.com/Kistras/REPO-Scanner).
+I believe that at this point the development of this mod is complete. [Still feel free to contribute, report issues or add suggestions](https://github.com/Kistras/REPO-Scanner).
 
 ## Configuring
 Use your modinstaller, BepInEx's config or [REPOConfig](https://thunderstore.io/c/repo/p/nickklmao/REPOConfig/)
@@ -22,9 +22,15 @@ You can change:
 - GUI (enabled by default)
 - GUI version (new by default)
 - Valuable items discovery (enabled by default)
+- Only scan already discovered items (disabled by default)
 - Enemies discovery (enabled by default)
 - Dead teammate's heads discovery (enabled by default)
 - Equippable items discovery (enabled by default)
+There are overrides for discover radius:
+- Override radius for valuables (0 to use main radius, 0 by default)
+- Override radius for enemies (0 to use main radius, 0 by default)
+- Override radius for dead teammates (0 to use main radius, 0 by default)
+- Override radius for equippable items (0 to use main radius, 0 by default)
 
 ## Installation
 0. Make sure you have BepInEx installed.
