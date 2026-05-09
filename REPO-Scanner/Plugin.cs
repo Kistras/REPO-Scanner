@@ -30,7 +30,7 @@ public class Plugin : BaseUnityPlugin {
         
         isCustomDiscoverStateLibLoaded = Chainloader.PluginInfos.ContainsKey("Kistras-CustomDiscoverStateLib");
         if (!isCustomDiscoverStateLibLoaded) {
-            Logger.LogInfo("CustomDiscoverStateLib is not loaded. Will fallback to \"Reminder\" graphic. Consider installing all dependencies.");
+            Logger.LogInfo("CustomDiscoverStateLib is not loaded. Will fallback to \"Reminder\" graphic (or custom one *if* it's present). Consider installing all dependencies.");
         }
 
         Logger.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} ({MyPluginInfo.PLUGIN_VERSION}) is loaded!");

@@ -63,13 +63,11 @@ public class ScannerGUI : MonoBehaviour {
         if (hudCanvasRect == null) {
             return;
         }
-
-        // Create container
+        
         uiContainer = new GameObject("ScannerUI");
         RectTransform containerRect = uiContainer.AddComponent<RectTransform>();
         containerRect.SetParent(hudCanvasRect, false);
         
-        // Make GUI 4 times smaller
         float adjustedBarWidth = barWidth;
         float adjustedBarHeight = barHeight;
         
@@ -79,11 +77,10 @@ public class ScannerGUI : MonoBehaviour {
         containerRect.anchoredPosition = new Vector2(0, -5f);
         containerRect.sizeDelta = new Vector2(adjustedBarWidth, adjustedBarHeight + 6.25f);
         
-        // Add canvas group for fading
+        // canvas group for fading
         canvasGroup = uiContainer.AddComponent<CanvasGroup>();
         canvasGroup.alpha = 0;
-
-        // Create background
+        
         GameObject bgObj = new GameObject("Background");
         RectTransform bgRect = bgObj.AddComponent<RectTransform>();
         bgRect.SetParent(containerRect, false);
@@ -94,7 +91,7 @@ public class ScannerGUI : MonoBehaviour {
         backgroundBar = bgObj.AddComponent<Image>();
         backgroundBar.color = new Color(0.2f, 0.2f, 0.2f, 0.6f);
 
-        // Create progress bar using mask instead of filled type
+        // mask
         GameObject barContainerObj = new GameObject("ProgressBarContainer");
         RectTransform barContainerRect = barContainerObj.AddComponent<RectTransform>();
         barContainerRect.SetParent(bgRect, false);
@@ -102,14 +99,12 @@ public class ScannerGUI : MonoBehaviour {
         barContainerRect.anchorMax = new Vector2(1, 1);
         barContainerRect.offsetMin = Vector2.zero;
         barContainerRect.offsetMax = Vector2.zero;
-
-        // Add a mask component to clip the progress bar
+        
         var mask = barContainerObj.AddComponent<Mask>();
         mask.showMaskGraphic = false;
         var maskImage = barContainerObj.AddComponent<Image>();
         maskImage.color = Color.white;
-
-        // Create actual progress bar inside the mask
+        
         GameObject barObj = new GameObject("ProgressBar");
         barRect = barObj.AddComponent<RectTransform>();
         barRect.SetParent(barContainerRect, false);
@@ -119,8 +114,7 @@ public class ScannerGUI : MonoBehaviour {
         barRect.offsetMax = Vector2.zero;
         progressBar = barObj.AddComponent<Image>();
         progressBar.color = barColor;
-
-        // Create text
+        
         GameObject textObj = new GameObject("StatusText");
         RectTransform textRect = textObj.AddComponent<RectTransform>();
         textRect.SetParent(containerRect, false);
@@ -167,7 +161,7 @@ public class ScannerGUI : MonoBehaviour {
         GUI.color = new Color(0.2f, 0.2f, 0.2f, 0.6f * displayAlpha);
         GUI.DrawTexture(new Rect(xPos, yPos, legacyBarWidth, legacyBarHeight), backgroundTexture);
         
-        // Foreground (filled portion) with orange color
+        // Foreground with orange color
         if (isOnCooldown) {
             GUI.color = new Color(barColor.r, barColor.g, barColor.b, barColor.a * displayAlpha);
             GUI.DrawTexture(new Rect(xPos, yPos, legacyBarWidth * (1f - cooldownRatio), legacyBarHeight), barTexture);
