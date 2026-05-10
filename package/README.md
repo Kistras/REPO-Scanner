@@ -27,12 +27,14 @@ You can change:
 - Dead teammate's heads discovery (enabled by default)
 - Equippable items discovery (enabled by default)
 - Cosmetic boxes discovery (enabled by default)
+- Custom discovery (enabled by default)
 There are overrides for discover radius:
 - Override radius for valuables (0 to use main radius, 0 by default)
 - Override radius for enemies (0 to use main radius, 0 by default)
 - Override radius for dead teammates (0 to use main radius, 0 by default)
 - Override radius for equippable items (0 to use main radius, 0 by default)
 - Override radius for cosmetic boxes (0 to use main radius, 0 by default)
+- Override radius for custom discoveries (0 to use main radius, 0 by default)
 
 ## Installation
 0. Make sure you have BepInEx installed.
@@ -54,6 +56,8 @@ Or use [Gale](https://thunderstore.io/c/repo/p/Kesomannen/GaleModManager/)/[r2mo
   <img src="https://i.imgur.com/zSZ1kwP.png" alt="Enemies"/>
   <h3>Items</h3>
   <img src="https://i.imgur.com/Od92yHa.png" alt="Items"/>
+  <h3>Cosmetic boxes (matches their normal color)</h3>
+  <img src="https://i.imgur.com/v63imv4.png" alt="Items"/>
 </details>
 
 ## Known issues

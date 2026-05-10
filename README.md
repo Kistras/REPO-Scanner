@@ -1,5 +1,5 @@
 ## What does it do
-You press a button (F by default), nearby valuable items are discovered (and shown on screen). Already discovered items are shown a second time. There is an option to only scan already discovered valuables (disabled by default).
+You press a button (F by default), nearby valuable items & cosmetic boxes are discovered (and shown on screen). Already discovered items are shown a second time. There is an option to only scan already discovered valuables (disabled by default).
 
 If Multiplayer RPC is enabled, items discovered for the first time with the scanner will appear on both your minimap and your friends', should you be playing multiplayer.
 
@@ -26,11 +26,15 @@ You can change:
 - Enemies discovery (enabled by default)
 - Dead teammate's heads discovery (enabled by default)
 - Equippable items discovery (enabled by default)
+- Cosmetic boxes discovery (enabled by default)
+- Custom discovery (enabled by default)
 There are overrides for discover radius:
 - Override radius for valuables (0 to use main radius, 0 by default)
 - Override radius for enemies (0 to use main radius, 0 by default)
 - Override radius for dead teammates (0 to use main radius, 0 by default)
 - Override radius for equippable items (0 to use main radius, 0 by default)
+- Override radius for cosmetic boxes (0 to use main radius, 0 by default)
+- Override radius for custom discoveries (0 to use main radius, 0 by default)
 
 ## Installation
 0. Make sure you have BepInEx installed.
@@ -52,9 +56,12 @@ Or use [Gale](https://thunderstore.io/c/repo/p/Kesomannen/GaleModManager/)/[r2mo
   <img src="https://i.imgur.com/zSZ1kwP.png" alt="Enemies"/>
   <h3>Items</h3>
   <img src="https://i.imgur.com/Od92yHa.png" alt="Items"/>
+  <h3>Cosmetic boxes (matches their normal color)</h3>
+  <img src="https://i.imgur.com/v63imv4.png" alt="Items"/>
 </details>
 
 ## Known issues
 - Enemy dimensions are currently broken, but their location is still accurately tracked.
 - Game freaks out when the scan size is too big. Nothing I can do, make it smaller in config by yourself.
 - Special mouse buttons, gamepad and special obscure keys cannot be used for keybinding. Will probably rework how keybinds work in the future.
+- When scanning for cosmetic boxes they will blip for each box each time. It's more bearable with regular valuables, but may get really annoying later on.

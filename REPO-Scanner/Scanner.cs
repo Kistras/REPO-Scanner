@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using BepInEx.Configuration;
 using HarmonyLib;
 using JetBrains.Annotations;
 using UnityEngine;
@@ -9,6 +11,7 @@ namespace REPO_Scanner;
 
 public class Scanner {
     private const ValuableDiscoverGraphic.State DiscoverValuableState = ValuableDiscoverGraphic.State.Discover;
+    // I feel like having extra linger on each scan specifically for enemies might be beneficial
     private const ValuableDiscoverGraphic.State DiscoverEnemyState = ValuableDiscoverGraphic.State.Bad;
     // While identical to the Bad state, this allows you not to get stuck in the Bad state for like 4 seconds
     private static ValuableDiscoverGraphic.State discoverHeadState = NewCustomState(
@@ -44,7 +47,6 @@ public class Scanner {
     
     private static void Initialize() {
         if (isInitialized) return;
-        //Plugin.Logger.LogInfo("Scanner initializing...");
         lastScanTime = ConfigManager.cooldown.Value;
         
         isInitialized = true;
@@ -78,101 +80,70 @@ public class Scanner {
         Vector3 scanPosition = Camera.main.transform.position;
         Collider[] colliders = Physics.OverlapSphere(scanPosition, ConfigManager.MaxScanRadius);
 
-        var scannedPositions = new System.Collections.Generic.List<Vector3>();
+        var scannedPositions = new List<Vector3>();
         foreach (Collider collider in colliders) {
             if (collider == null || collider.transform == null) continue;
             
             // Valuables
-            if (ConfigManager.shouldScanValuables.Value) {
-                ValuableObject valuable = GetComponentOfType<ValuableObject>(collider);
-                if (valuable != null) {
-                    float scanRadius = ConfigManager.scanRadiusValuablesOverride.Value > 0f 
-                        ? ConfigManager.scanRadiusValuablesOverride.Value 
-                        : ConfigManager.scanRadius.Value;
-                    if (Vector3.Distance(valuable.transform.position, scanPosition) > scanRadius) continue;
-                    
-                    if (ConfigManager.onlyScanDiscoveredValuables.Value && !valuable.discovered) continue;
-                    if (HasScannedItemsNearby(valuable.transform.position, scannedPositions)) continue;
-                    
-                    if (ConfigManager.multiplayerReveal.Value) {
-                        valuable.Discover(DiscoverValuableState);
-                    } else {
-                        ValuableDiscover.instance.New(valuable.physGrabObject, DiscoverValuableState, GetComponentOfType<ValuableDiscoverCustom>(collider));
-                    }
-                    continue;
-                }
-            }
-
-            // Enemies
-            if (ConfigManager.shouldScanEnemies.Value) {
-                EnemyRigidbody enemy = GetComponentOfType<EnemyRigidbody>(collider);
-                if (enemy != null) {
-                        float scanRadius = ConfigManager.scanRadiusEnemiesOverride.Value > 0f 
-                            ? ConfigManager.scanRadiusEnemiesOverride.Value 
-                            : ConfigManager.scanRadius.Value;
-                        if (Vector3.Distance(enemy.transform.position, scanPosition) > scanRadius) continue;
-                        
-                    if (HasScannedItemsNearby(enemy.transform.position, scannedPositions)) continue;
-                    ValuableDiscover.instance.New(enemy.physGrabObject, DiscoverEnemyState, GetComponentOfType<ValuableDiscoverCustom>(collider));
-                    continue;
-                }
-            }
+            if (ScanItems<ValuableObject>(collider, ConfigManager.shouldScanValuables, scanPosition, ConfigManager.scanRadiusValuablesOverride, scannedPositions, DiscoverValuableState))
+                continue;
             
+            // Enemies
+            if (ScanItems<EnemyRigidbody>(collider, ConfigManager.shouldScanEnemies, scanPosition, ConfigManager.scanRadiusEnemiesOverride, scannedPositions, DiscoverEnemyState))
+                continue;
+
             // Heads
-            if (ConfigManager.shouldScanHeads.Value) {
-                PlayerDeathHead head = GetComponentOfType<PlayerDeathHead>(collider);
-                if (head != null) {
-                    float scanRadius = ConfigManager.scanRadiusHeadsOverride.Value > 0f 
-                        ? ConfigManager.scanRadiusHeadsOverride.Value 
-                        : ConfigManager.scanRadius.Value;
-                    if (Vector3.Distance(head.transform.position, scanPosition) > scanRadius) continue;
-                    
-                    if (HasScannedItemsNearby(head.transform.position, scannedPositions)) continue;
-                    ValuableDiscover.instance.New(head.physGrabObject, discoverHeadState, GetComponentOfType<ValuableDiscoverCustom>(collider));
-                    continue;
-                }
-            }
+            if (ScanItems<PlayerDeathHead>(collider, ConfigManager.shouldScanHeads, scanPosition, ConfigManager.scanRadiusHeadsOverride, scannedPositions, discoverHeadState))
+                continue;
             
             // Items
-            if (ConfigManager.shouldScanItems.Value) {
-                ItemAttributes item = GetComponentOfType<ItemAttributes>(collider);
-                if (item != null) {
-                    float scanRadius = ConfigManager.scanRadiusItemsOverride.Value > 0f 
-                        ? ConfigManager.scanRadiusItemsOverride.Value 
-                        : ConfigManager.scanRadius.Value;
-                    if (Vector3.Distance(item.transform.position, scanPosition) > scanRadius) continue;
-                    
-                    if (HasScannedItemsNearby(item.transform.position, scannedPositions)) continue;
-                    ValuableDiscover.instance.New(item.physGrabObject, discoverItemState, GetComponentOfType<ValuableDiscoverCustom>(collider));
-                    continue;
-                }
-            }
+            if (ScanItems<ItemAttributes>(collider, ConfigManager.shouldScanItems, scanPosition, ConfigManager.scanRadiusItemsOverride, scannedPositions, discoverItemState))
+                continue;
             
-            // Cosmetics & anything that has ValuableDiscoverCustom
-            if (ConfigManager.shouldScanCustom.Value) {
-                ValuableDiscoverCustom discoverCustom = GetComponentOfType<ValuableDiscoverCustom>(collider);
-                if (discoverCustom != null) {
-                    float scanRadius = ConfigManager.scanRadiusCustomOverride.Value > 0f 
-                        ? ConfigManager.scanRadiusCustomOverride.Value 
-                        : ConfigManager.scanRadius.Value;
-                    if (Vector3.Distance(discoverCustom.transform.position, scanPosition) > scanRadius) continue;
-                    
-                    if (HasScannedItemsNearby(discoverCustom.transform.position, scannedPositions)) continue;
-                    
-                    if (ConfigManager.multiplayerReveal.Value) {
-                        discoverCustom.Discover();
-                    } else {
-                        ValuableDiscover.instance.New(discoverCustom.physGrabObject, ValuableDiscoverGraphic.State.Custom, discoverCustom);
-                    }
-                    continue;
-                }
-            }
+            // Cosmetics
+            if (ScanItems<CosmeticWorldObject>(collider, ConfigManager.shouldScanCosmetics, scanPosition, ConfigManager.scanRadiusCosmeticsOverride, scannedPositions, discoverCosmeticState))
+                continue;
+            
+            // HAS TO BE THE LAST
+            // Anything that has ValuableDiscoverCustom
+            if (GetComponentOfType<ValuableDiscoverCustom>(collider) == null && ScanItems<ValuableDiscoverCustom>(collider, ConfigManager.shouldScanCustom, scanPosition, ConfigManager.scanRadiusCustomOverride, scannedPositions, ValuableDiscoverGraphic.State.Custom))
+                continue;
         }
 
         lastScanTime = Time.time;
         if (ScannerGUI.Instance != null) {
             ScannerGUI.Instance.NotifyScan();
         }
+    }
+
+    private static bool ScanItems<TComponent>(
+            Collider collider, ConfigEntry<bool> shouldScan, Vector3 scanPosition, 
+            ConfigEntry<float> scanRadiusOverride, List<Vector3> scannedPositions, ValuableDiscoverGraphic.State state
+        ) where TComponent : MonoBehaviour {
+        if (!shouldScan.Value) return false;
+        
+        TComponent component = GetComponentOfType<TComponent>(collider);
+        if (component == null) return false;
+        
+        float scanRadius = scanRadiusOverride.Value > 0f 
+            ? scanRadiusOverride.Value 
+            : ConfigManager.scanRadius.Value;
+        if (Vector3.Distance(component.transform.position, scanPosition) > scanRadius) return false;
+                    
+        if (HasScannedItemsNearby(component.transform.position, scannedPositions)) return false;
+
+        // TODO: Cosmetics?
+        if (ConfigManager.onlyScanDiscoveredValuables.Value && component is ValuableObject { discovered: false }) return false;
+        
+        // TODO: Cosmetics.
+        if (ConfigManager.multiplayerReveal.Value && component is ValuableObject { discovered: false } discoverable) {
+            discoverable.Discover(state);
+        } else {
+            PhysGrabObject physGrabObject = GetComponentOfType<PhysGrabObject>(collider);
+            if (physGrabObject == null) return true; // No point in trying any further
+            ValuableDiscover.instance.New(physGrabObject, state, GetComponentOfType<ValuableDiscoverCustom>(collider));
+        }
+        return true;
     }
 
     private static bool HasScannedItemsNearby(Vector3 itemPos, System.Collections.Generic.List<Vector3> scannedPositions) {

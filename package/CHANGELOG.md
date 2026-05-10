@@ -1,3 +1,5 @@
+1.3.1 - Separate support for cosmetics and custom
+
 1.3.0 - Now works with 0.4.0. Also highlights cosmetics
 
 1.2.0 - Updated dependencies, added separate options to override scan radius for specific categories and an option to only show already discovered valuables

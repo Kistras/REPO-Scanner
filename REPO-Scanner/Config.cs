@@ -23,12 +23,14 @@ public static class ConfigManager {
     public static ConfigEntry<bool> shouldScanEnemies;
     public static ConfigEntry<bool> shouldScanHeads;
     public static ConfigEntry<bool> shouldScanItems;
+    public static ConfigEntry<bool> shouldScanCosmetics;
     public static ConfigEntry<bool> shouldScanCustom;
     
     public static ConfigEntry<float> scanRadiusValuablesOverride;
     public static ConfigEntry<float> scanRadiusEnemiesOverride;
     public static ConfigEntry<float> scanRadiusHeadsOverride;
     public static ConfigEntry<float> scanRadiusItemsOverride;
+    public static ConfigEntry<float> scanRadiusCosmeticsOverride;
     public static ConfigEntry<float> scanRadiusCustomOverride;
 
     public static float MaxScanRadius
@@ -39,6 +41,7 @@ public static class ConfigManager {
             if (shouldScanEnemies.Value) max = Mathf.Max(max, scanRadiusEnemiesOverride.Value > 0 ? scanRadiusEnemiesOverride.Value : scanRadius.Value);
             if (shouldScanHeads.Value) max = Mathf.Max(max, scanRadiusHeadsOverride.Value > 0 ? scanRadiusHeadsOverride.Value : scanRadius.Value);
             if (shouldScanItems.Value) max = Mathf.Max(max, scanRadiusItemsOverride.Value > 0 ? scanRadiusItemsOverride.Value : scanRadius.Value);
+            if (shouldScanCosmetics.Value) max = Mathf.Max(max, scanRadiusCosmeticsOverride.Value > 0 ? scanRadiusCosmeticsOverride.Value : scanRadius.Value);
             if (shouldScanCustom.Value) max = Mathf.Max(max, scanRadiusCustomOverride.Value > 0 ? scanRadiusCustomOverride.Value : scanRadius.Value);
             return Mathf.Min(max, MaxRadius);
         }
@@ -75,8 +78,10 @@ public static class ConfigManager {
             new ConfigDescription("Whether to scan dead player's heads"));
         shouldScanItems = plugin.Config.Bind("Features", "Items", true, 
             new ConfigDescription("Whether to scan equippable items"));
+        shouldScanCosmetics = plugin.Config.Bind("Features", "Cosmetics", true, 
+            new ConfigDescription("Whether to scan cosmetic boxes"));
         shouldScanCustom = plugin.Config.Bind("Features", "Custom", true, 
-            new ConfigDescription("Whether to scan cosmetic boxes and anything with custom discover feature"));
+            new ConfigDescription("Whether to scan anything with custom discover feature"));
         
         scanRadiusValuablesOverride = plugin.Config.Bind("Radius Overrides", "Valuables", 0f, 
             new ConfigDescription("Override scan radius for valuables (0 to use main radius)", new AcceptableValueRange<float>(0f, MaxRadius)));
@@ -86,8 +91,10 @@ public static class ConfigManager {
             new ConfigDescription("Override scan radius for heads (0 to use main radius)", new AcceptableValueRange<float>(0f, MaxRadius)));
         scanRadiusItemsOverride = plugin.Config.Bind("Radius Overrides", "Items", 0f, 
             new ConfigDescription("Override scan radius for items (0 to use main radius)", new AcceptableValueRange<float>(0f, MaxRadius)));
+        scanRadiusCosmeticsOverride = plugin.Config.Bind("Radius Overrides", "Cosmetics", 0f, 
+            new ConfigDescription("Override scan radius for cosmetic boxes (0 to use main radius)", new AcceptableValueRange<float>(0f, MaxRadius)));
         scanRadiusCustomOverride = plugin.Config.Bind("Radius Overrides", "Custom", 0f, 
-            new ConfigDescription("Override scan radius for cosmetic boxes and anything with custom discover feature (0 to use main radius)", new AcceptableValueRange<float>(0f, MaxRadius)));
+            new ConfigDescription("Override scan radius for anything with custom discover feature (0 to use main radius)", new AcceptableValueRange<float>(0f, MaxRadius)));
         
         IsLegacyVersionGUI = versionGUI.Value == "Legacy";
             
