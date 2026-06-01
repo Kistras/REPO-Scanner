@@ -1,3 +1,5 @@
+1.4.0 - Reworked configs, added color configuration support. No longer uses CustomDiscoverStateLib
+
 1.3.1 - Separate support for cosmetics and custom
 
 1.3.0 - Now works with 0.4.0. Also highlights cosmetics

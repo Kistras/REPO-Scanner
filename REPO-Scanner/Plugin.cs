@@ -13,14 +13,11 @@ using UnityEngine.InputSystem;
 namespace REPO_Scanner;
 
 [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
-[BepInDependency("Kistras-CustomDiscoverStateLib", BepInDependency.DependencyFlags.SoftDependency)]
 public class Plugin : BaseUnityPlugin {
     internal new static ManualLogSource Logger;
     private readonly Harmony harmony = new Harmony(MyPluginInfo.PLUGIN_GUID);
-    internal static bool isCustomDiscoverStateLibLoaded;
     
     private void Awake() {
-        // Plugin startup logic
         Logger = base.Logger;
 
         ConfigManager.Initialize(this);
@@ -28,11 +25,6 @@ public class Plugin : BaseUnityPlugin {
         harmony.PatchAll(typeof(Patches));
         Logger.LogInfo($"Patched {harmony.GetPatchedMethods().Count()} methods!");
         
-        isCustomDiscoverStateLibLoaded = Chainloader.PluginInfos.ContainsKey("Kistras-CustomDiscoverStateLib");
-        if (!isCustomDiscoverStateLibLoaded) {
-            Logger.LogInfo("CustomDiscoverStateLib is not loaded. Will fallback to \"Reminder\" graphic (or custom one *if* it's present). Consider installing all dependencies.");
-        }
-
         Logger.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} ({MyPluginInfo.PLUGIN_VERSION}) is loaded!");
     }
 }

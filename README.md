@@ -16,25 +16,19 @@ Use your modinstaller, BepInEx's config or [REPOConfig](https://thunderstore.io/
 
 You can change:
 - Keybind for scanning (f by default)
-- Scan radius (10 by default)
+- Global scan radius (10 by default)
 - Cooldown (10 by default)
 - Multiplayer RPC discovery (enabled by default)
 - GUI (enabled by default)
 - GUI version (new by default)
-- Valuable items discovery (enabled by default)
-- Only scan already discovered items (disabled by default)
-- Enemies discovery (enabled by default)
-- Dead teammate's heads discovery (enabled by default)
-- Equippable items discovery (enabled by default)
-- Cosmetic boxes discovery (enabled by default)
-- Custom discovery (enabled by default)
-There are overrides for discover radius:
-- Override radius for valuables (0 to use main radius, 0 by default)
-- Override radius for enemies (0 to use main radius, 0 by default)
-- Override radius for dead teammates (0 to use main radius, 0 by default)
-- Override radius for equippable items (0 to use main radius, 0 by default)
-- Override radius for cosmetic boxes (0 to use main radius, 0 by default)
-- Override radius for custom discoveries (0 to use main radius, 0 by default)
+
+There are several configuration options for each category:
+- Whether to scan at all (all). Enabled by default
+- Override scan radius (all. 0 to use global radius). 0 by default
+- Only scan already discovered items (valuables, cosmetics and custom only). Disabled by default
+- Reveal scan results on other player's minimap (valuables, cosmetics and custom only). Disabled by default
+- Color for both borders and (all except cosmetics and custom). Note that this will not override normal discovery. Matches normal ingame colors
+- For how long the scan should keep lingering (all except cosmetics and custom). By default 4 seconds for enemies and 1.5 for everything else.
 
 ## Installation
 0. Make sure you have BepInEx installed.

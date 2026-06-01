@@ -29,9 +29,6 @@
       <Reference Include="Assembly-CSharp">
         <HintPath>D:\Program Files\Steam\steamapps\common\REPO\ref\Assembly-CSharp-publicized.dll</HintPath>
       </Reference>
-      <Reference Include="Kistras-CustomDiscoverStateLib">
-        <HintPath>..\..\CustomDiscoverStateLib\bin\Debug\netstandard2.1\Kistras-CustomDiscoverStateLib.dll</HintPath>
-      </Reference>
       <Reference Include="MenuLib">
         <HintPath>D:\Program Files\Gale\MODFOLD\repo\profiles\Default\BepInEx\plugins\nickklmao-MenuLib\MenuLib.dll</HintPath>
       </Reference>

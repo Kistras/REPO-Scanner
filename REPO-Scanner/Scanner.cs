@@ -5,58 +5,37 @@ using System.Reflection;
 using BepInEx.Configuration;
 using HarmonyLib;
 using JetBrains.Annotations;
+using Photon.Pun;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace REPO_Scanner;
 
 public class Scanner {
-    private const ValuableDiscoverGraphic.State DiscoverValuableState = ValuableDiscoverGraphic.State.Discover;
-    // I feel like having extra linger on each scan specifically for enemies might be beneficial
-    private const ValuableDiscoverGraphic.State DiscoverEnemyState = ValuableDiscoverGraphic.State.Bad;
-    // While identical to the Bad state, this allows you not to get stuck in the Bad state for like 4 seconds
-    private static ValuableDiscoverGraphic.State discoverHeadState = NewCustomState(
-        new Color(1f, 0.0f, 0.067f, 0.17f), 
-        new Color(1f, 0.1f, 0.067f, 0.75f));
-    private static ValuableDiscoverGraphic.State discoverItemState = NewCustomState(
-        new Color(0.0f, 0.5f, 0.8f, 0.17f), 
-        new Color(0.1f, 0.6f, 0.9f, 0.75f));
-    private static ValuableDiscoverGraphic.State discoverCosmeticState = NewCustomState( // as fallback
-        new Color(0.1f, 0.8f, 0.5f, 0.17f), 
-        new Color(0.2f, 0.9f, 0.6f, 0.75f));
+    private static CustomDiscovery<ValuableObject> discoverValuableCustom; 
+    private static CustomDiscovery<EnemyRigidbody> discoverEnemyCustom;
+    private static CustomDiscovery<PlayerDeathHead> discoverHeadCustom;
+    private static CustomDiscovery<ItemAttributes> discoverToolCustom;
+    private static CustomDiscovery<CosmeticWorldObject> discoverCosmeticCustom;
+    private static CustomDiscovery<ValuableDiscoverCustom> discoverCustomFallback;
     private static float lastScanTime;
     private static bool isInitialized = false;
-    
-    // I have no idea how Thunderstore handles missing dependencies if they appear unexpectedly,
-    //     so I wanted to make this lib optional
-    private static ValuableDiscoverGraphic.State NewCustomState(Color middle, Color corner) {
-        if (Plugin.isCustomDiscoverStateLibLoaded) {
-            try {
-                Type customStateType = AccessTools.TypeByName("CustomDiscoverStateLib.CustomDiscoverState");
-                if (customStateType != null) {
-                    MethodInfo method = AccessTools.Method(customStateType, "AddNewDiscoverGraphic");
-                    if (method != null) {
-                        return (ValuableDiscoverGraphic.State)method.Invoke(null, new object[] { middle, corner });
-                    }
-                }
-            } catch (Exception ex) {
-                Plugin.Logger.LogError($"Error accessing CustomDiscoverState: {ex.Message}");
-            }
-        }
-        return ValuableDiscoverGraphic.State.Reminder;
-    }
+
+    private static ICustomDiscovery[] Discoveries => [discoverValuableCustom, discoverEnemyCustom, discoverHeadCustom, discoverToolCustom, discoverCosmeticCustom, discoverCustomFallback];
     
     private static void Initialize() {
         if (isInitialized) return;
         lastScanTime = ConfigManager.cooldown.Value;
         
+        discoverValuableCustom = new (ConfigManager.Valuables); 
+        discoverEnemyCustom = new (ConfigManager.Enemies);
+        discoverHeadCustom = new (ConfigManager.Heads);
+        discoverToolCustom = new (ConfigManager.Tools);
+        discoverCosmeticCustom = new (ConfigManager.Cosmetics);
+        discoverCustomFallback = new (ConfigManager.Custom);
+        
         isInitialized = true;
         Plugin.Logger.LogInfo("Scanner initialized successfully");
-    }
-
-    [CanBeNull]
-    private static T GetComponentOfType<T>(Collider gameObject) where T : Component {
-        T comp = gameObject.GetComponentInParent<T>() ?? gameObject.GetComponentInChildren<T>();
-        return comp;
     }
 
     public static void Scan() {
@@ -80,80 +59,18 @@ public class Scanner {
         Vector3 scanPosition = Camera.main.transform.position;
         Collider[] colliders = Physics.OverlapSphere(scanPosition, ConfigManager.MaxScanRadius);
 
-        var scannedPositions = new List<Vector3>();
+        List<Vector3> scannedPositions = new();
         foreach (Collider collider in colliders) {
-            if (collider == null || collider.transform == null) continue;
+            if (collider == null || collider.gameObject == null) continue;
             
-            // Valuables
-            if (ScanItems<ValuableObject>(collider, ConfigManager.shouldScanValuables, scanPosition, ConfigManager.scanRadiusValuablesOverride, scannedPositions, DiscoverValuableState))
-                continue;
-            
-            // Enemies
-            if (ScanItems<EnemyRigidbody>(collider, ConfigManager.shouldScanEnemies, scanPosition, ConfigManager.scanRadiusEnemiesOverride, scannedPositions, DiscoverEnemyState))
-                continue;
-
-            // Heads
-            if (ScanItems<PlayerDeathHead>(collider, ConfigManager.shouldScanHeads, scanPosition, ConfigManager.scanRadiusHeadsOverride, scannedPositions, discoverHeadState))
-                continue;
-            
-            // Items
-            if (ScanItems<ItemAttributes>(collider, ConfigManager.shouldScanItems, scanPosition, ConfigManager.scanRadiusItemsOverride, scannedPositions, discoverItemState))
-                continue;
-            
-            // Cosmetics
-            if (ScanItems<CosmeticWorldObject>(collider, ConfigManager.shouldScanCosmetics, scanPosition, ConfigManager.scanRadiusCosmeticsOverride, scannedPositions, discoverCosmeticState))
-                continue;
-            
-            // HAS TO BE THE LAST
-            // Anything that has ValuableDiscoverCustom
-            if (GetComponentOfType<ValuableDiscoverCustom>(collider) == null && ScanItems<ValuableDiscoverCustom>(collider, ConfigManager.shouldScanCustom, scanPosition, ConfigManager.scanRadiusCustomOverride, scannedPositions, ValuableDiscoverGraphic.State.Custom))
-                continue;
+            foreach (ICustomDiscovery discovery in Discoveries)
+                if (discovery.ScanItems(collider, scanPosition, scannedPositions)) break;
         }
 
         lastScanTime = Time.time;
         if (ScannerGUI.Instance != null) {
             ScannerGUI.Instance.NotifyScan();
         }
-    }
-
-    private static bool ScanItems<TComponent>(
-            Collider collider, ConfigEntry<bool> shouldScan, Vector3 scanPosition, 
-            ConfigEntry<float> scanRadiusOverride, List<Vector3> scannedPositions, ValuableDiscoverGraphic.State state
-        ) where TComponent : MonoBehaviour {
-        if (!shouldScan.Value) return false;
-        
-        TComponent component = GetComponentOfType<TComponent>(collider);
-        if (component == null) return false;
-        
-        float scanRadius = scanRadiusOverride.Value > 0f 
-            ? scanRadiusOverride.Value 
-            : ConfigManager.scanRadius.Value;
-        if (Vector3.Distance(component.transform.position, scanPosition) > scanRadius) return false;
-                    
-        if (HasScannedItemsNearby(component.transform.position, scannedPositions)) return false;
-
-        // TODO: Cosmetics?
-        if (ConfigManager.onlyScanDiscoveredValuables.Value && component is ValuableObject { discovered: false }) return false;
-        
-        // TODO: Cosmetics.
-        if (ConfigManager.multiplayerReveal.Value && component is ValuableObject { discovered: false } discoverable) {
-            discoverable.Discover(state);
-        } else {
-            PhysGrabObject physGrabObject = GetComponentOfType<PhysGrabObject>(collider);
-            if (physGrabObject == null) return true; // No point in trying any further
-            ValuableDiscover.instance.New(physGrabObject, state, GetComponentOfType<ValuableDiscoverCustom>(collider));
-        }
-        return true;
-    }
-
-    private static bool HasScannedItemsNearby(Vector3 itemPos, System.Collections.Generic.List<Vector3> scannedPositions) {
-        foreach (Vector3 pos in scannedPositions) {
-            if (Vector3.Distance(pos, itemPos) < 0.1f) {
-                return true;
-            }
-        }
-        scannedPositions.Add(itemPos);
-        return false;
     }
 
     public static void Update() {}

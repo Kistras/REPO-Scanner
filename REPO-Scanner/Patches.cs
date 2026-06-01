@@ -65,4 +65,14 @@ public class Patches {
         guiObject.transform.SetParent(HUDCanvas.instance.transform, false);
         //GameObject.DontDestroyOnLoad(guiObject);
     }
+
+    // Only useful to hide an error in console basically
+    // My creation of ValuableDiscoverCustom throws an error bc it's not tied to an actual object
+    internal static bool shouldSuppressValuableDiscoverCustomAwake = false;
+    [HarmonyPatch(typeof(ValuableDiscoverCustom), "Awake")]
+    [HarmonyPrefix]
+    private static bool SuppressValuableDiscoverCustomAwakePatch() 
+    {
+        return !shouldSuppressValuableDiscoverCustomAwake;
+    }
 }
