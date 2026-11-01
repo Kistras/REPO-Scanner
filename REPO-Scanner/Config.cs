@@ -154,7 +154,8 @@ public static class ConfigManager {
         string keybind = KeyCodeToBindingPath(keyBind.Value);
         
         Plugin.Logger.LogInfo($"Keybind changed to: {keybind}");
-        InputManager.instance.Rebind(scanKey, keybind);
+        // TODO: get rid on InputManager, nobody uses it iirc
+        InputManager.instance.Rebind(scanKey, "other", keybind);
     }
     
     internal static string KeyCodeToBindingPath(KeyCode keyCode) {

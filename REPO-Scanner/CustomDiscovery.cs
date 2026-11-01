@@ -39,7 +39,7 @@ internal class CustomDiscovery<T> : ICustomDiscovery where T : MonoBehaviour {
                     Patches.shouldSuppressValuableDiscoverCustomAwake = false;
                 }
                 UpdateData();
-                Plugin.Logger.LogWarning($"Created new ValuableDiscoverCustom component for {typeof(T).Name} discovery with colors {config.CornerColor} and {config.MiddleColor} and linger {config.ScanLinger.Value}");
+                // Plugin.Logger.LogWarning($"Created new ValuableDiscoverCustom component for {typeof(T).Name} discovery with colors {config.CornerColor} and {config.MiddleColor} and linger {config.ScanLinger.Value}");
             }
         }
         return component;
