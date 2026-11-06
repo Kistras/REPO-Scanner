@@ -27,7 +27,7 @@ There are several configuration options for each category:
 - Override scan radius (all. 0 to use global radius). 0 by default
 - Only scan already discovered items (valuables, cosmetics and custom only). Disabled by default
 - Reveal scan results on other player's minimap (valuables, cosmetics and custom only). Disabled by default
-- Color for both borders and (all except cosmetics and custom). Note that this will not override normal discovery. Matches normal ingame colors
+- Color for both borders and filler (all except cosmetics and custom). Note that this will not override normal discovery. Matches normal ingame colors by default.
 - For how long the scan should keep lingering (all except cosmetics and custom). By default 4 seconds for enemies and 1.5 for everything else.
 
 ## Installation
@@ -57,5 +57,4 @@ Or use [Gale](https://thunderstore.io/c/repo/p/Kesomannen/GaleModManager/)/[r2mo
 ## Known issues
 - Enemy dimensions are currently broken, but their location is still accurately tracked.
 - Game freaks out when the scan size is too big. Nothing I can do, make it smaller in config by yourself.
-- Special mouse buttons, gamepad and special obscure keys cannot be used for keybinding. Will probably rework how keybinds work in the future.
 - When scanning for cosmetic boxes they will blip for each box each time. It's more bearable with regular valuables, but may get really annoying later on.

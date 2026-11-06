@@ -59,6 +59,7 @@ public class ScannerGUI : MonoBehaviour {
         }
         
         // New version
+        // TODO: this is a mess
         RectTransform hudCanvasRect = HUDCanvas.instance.rect;
         if (hudCanvasRect == null) {
             return;

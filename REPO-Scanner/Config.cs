@@ -76,8 +76,6 @@ public class ConfigCategory {
 public static class ConfigManager {
     internal const float MaxRadius = 100f;
 
-    public static InputKey scanKey = (InputKey)327;
-
     public static ConfigEntry<KeyCode> keyBind;
     public static ConfigEntry<float> scanRadius;
     public static ConfigEntry<float> cooldown;
@@ -104,7 +102,6 @@ public static class ConfigManager {
         MaxScanRadius = Mathf.Min(max, MaxRadius);
     }
     
-    private static KeyCode _storedKeybind; // Used to check if keybind has changed
     private static bool _initialized = false;
     
     internal static void Initialize(Plugin plugin) {
@@ -131,10 +128,6 @@ public static class ConfigManager {
         Custom = new ConfigCategory(plugin, "custom", "#FFFFFFBF", "#FFFFFF2B", false, false, false,false, 1.5f);
         
         IsLegacyVersionGUI = versionGUI.Value == "Legacy";
-            
-        keyBind.SettingChanged += (sender, args) => {
-            RebindScan();
-        };
         versionGUI.SettingChanged += (sender, args) => {
             IsLegacyVersionGUI = versionGUI.Value == "Legacy";
             if (!ScannerGUI.Instance) return;
@@ -144,44 +137,5 @@ public static class ConfigManager {
         };
 
         UpdateMaxScanRadius();
-    }
-    
-    internal static void RebindScan() {
-        if (keyBind?.Value == null || InputManager.instance == null) return;
-        
-        if (_storedKeybind == keyBind.Value) return;
-        _storedKeybind = keyBind.Value;
-        string keybind = KeyCodeToBindingPath(keyBind.Value);
-        
-        Plugin.Logger.LogInfo($"Keybind changed to: {keybind}");
-        // TODO: get rid on InputManager, nobody uses it iirc
-        InputManager.instance.Rebind(scanKey, "other", keybind);
-    }
-    
-    internal static string KeyCodeToBindingPath(KeyCode keyCode) {
-        // Number keys
-        if (keyCode >= KeyCode.Alpha0 && keyCode <= KeyCode.Alpha9)
-            return $"<keyboard>/{keyCode.ToString().Replace("Alpha", "")}";
-        
-        // Mouse buttons
-        if (keyCode == KeyCode.Mouse0) return "<mouse>/leftButton";
-        if (keyCode == KeyCode.Mouse1) return "<mouse>/rightButton";
-        if (keyCode == KeyCode.Mouse2) return "<mouse>/middleButton";
-        if (keyCode is >= KeyCode.Mouse3 and <= KeyCode.Mouse6)
-            return $"<mouse>/button{(int)keyCode - (int)KeyCode.Mouse0}";
-        
-        // Special keys
-        switch (keyCode) {
-            case KeyCode.Return: return "<keyboard>/enter";
-            case KeyCode.LeftControl: return "<keyboard>/leftCtrl";
-            case KeyCode.RightControl: return "<keyboard>/rightCtrl";
-            default:
-                string keyName = keyCode.ToString();
-                if (keyName.Length > 0) {
-                    keyName = char.ToLower(keyName[0]) + keyName[1..];
-                }
-                return $"<keyboard>/{keyName}";
-            //return $"<keyboard>/{keyCode.ToString().ToLower()}";
-        }
     }
 }

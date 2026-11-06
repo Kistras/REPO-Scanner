@@ -1,3 +1,5 @@
+1.4.3 - Fixed keybindings, no longer conflicts with KeybindLib (sorry), mouse6/controllers/other esoteric keybinds are now supported
+
 1.4.2 - Now works with 0.5.0
 
 1.4.0 - Reworked configs, added color configuration support. No longer uses CustomDiscoverStateLib
